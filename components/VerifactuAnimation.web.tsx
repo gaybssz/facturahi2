@@ -3,7 +3,7 @@
 // Requires: npm i framer-motion lucide-react
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, FilePlus2, ShoppingCart, Send, FileText, Fingerprint, QrCode } from 'lucide-react';
+import { Check, FilePlus2, ShoppingCart, Send, FileText, Fingerprint } from 'lucide-react';
 
 function cn(...parts: Array<string | false | undefined>) {
   return parts.filter(Boolean).join(' ');
