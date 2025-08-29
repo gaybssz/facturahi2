@@ -10,7 +10,6 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 
 // Breakpoint similar to Tailwind's lg
@@ -19,16 +18,17 @@ const useIsWide = () => {
   return width >= 1024;
 };
 
-export default function LoginScreenWeb() {
+export default function SignupScreenWeb() {
   const router = useRouter();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const isWide = useIsWide();
 
   const onSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert('Falta información', 'Ingresa email y contraseña.');
+    if (!name || !email || !password) {
+      Alert.alert('Faltan datos', 'Completa todos los campos.');
       return;
     }
     try {
@@ -36,7 +36,7 @@ export default function LoginScreenWeb() {
       await new Promise((r) => setTimeout(r, 600));
       router.replace('/(tabs)');
     } catch {
-      Alert.alert('No se pudo iniciar sesión', 'Inténtalo de nuevo.');
+      Alert.alert('No se pudo registrar', 'Inténtalo de nuevo.');
     } finally {
       setSubmitting(false);
     }
@@ -47,24 +47,27 @@ export default function LoginScreenWeb() {
       behavior={Platform.select({ ios: 'padding', android: undefined })}
       style={styles.screen}
     >
-      {/* Two-column grid on wide screens, single column otherwise */}
       <View style={[styles.grid, isWide ? styles.gridWide : styles.gridNarrow]}>
-        {/* Left: form with fixed max width */}
         <View style={styles.leftPane}>
           <View style={styles.formWrap}>
             <View>
-              <ThemedText style={styles.h1}>Inicia sesión</ThemedText>
-              <ThemedText style={styles.muted}>
-                ¿No tienes cuenta?{' '}
-                <Link href="/(auth)/signup">
-                  <ThemedText style={[styles.linkStrong, styles.link]}>
-                    Regístrate
-                  </ThemedText>
-                </Link>
-              </ThemedText>
+              <ThemedText style={styles.h1}>Crea una cuenta</ThemedText>
+              <ThemedText style={styles.muted}>Introduce tus datos para empezar</ThemedText>
             </View>
 
             <View style={{ marginTop: 24 }}>
+              <View style={{ gap: 6, marginBottom: 14 }}>
+                <ThemedText style={styles.label}>Nombre completo</ThemedText>
+                <TextInput
+                  placeholder="John Doe"
+                  autoCapitalize="words"
+                  placeholderTextColor="#9ca3af"
+                  value={name}
+                  onChangeText={setName}
+                  style={styles.input}
+                />
+              </View>
+
               <View style={{ gap: 6, marginBottom: 14 }}>
                 <ThemedText style={styles.label}>Email</ThemedText>
                 <TextInput
@@ -80,16 +83,9 @@ export default function LoginScreenWeb() {
               </View>
 
               <View style={{ gap: 6, marginBottom: 14 }}>
-                <View style={styles.rowBetween}>
-                  <ThemedText style={styles.label}>Contraseña</ThemedText>
-              <Link href="/(auth)/forgot">
-                <ThemedText type="link" style={[styles.link, styles.small]}>
-                  ¿Has olvidado tu contraseña?
-                </ThemedText>
-              </Link>
-                </View>
+                <ThemedText style={styles.label}>Contraseña</ThemedText>
                 <TextInput
-                  placeholder="Contraseña"
+                  placeholder="Mínimo 6 caracteres"
                   secureTextEntry
                   placeholderTextColor="#9ca3af"
                   value={password}
@@ -104,36 +100,33 @@ export default function LoginScreenWeb() {
                 disabled={submitting}
               >
                 <ThemedText style={styles.primaryText}>
-                  {submitting ? 'Ingresando…' : 'Iniciar sesión'}
+                  {submitting ? 'Creando…' : 'Crear cuenta'}
                 </ThemedText>
               </Pressable>
-            </View>
 
-            {/* Divider */}
-            <View style={styles.altDivider}>
-              <View style={styles.altLine} />
-              <ThemedText style={styles.altText}>O continúa con</ThemedText>
-              <View style={styles.altLine} />
+              <View style={{ marginTop: 20, alignItems: 'center' }}>
+                <ThemedText style={styles.muted}>
+                  ¿Ya tienes una cuenta?{' '}
+                  <Link href="/(auth)/login">
+                    <ThemedText style={[styles.linkStrong, styles.link]}>Iniciar sesión</ThemedText>
+                  </Link>
+                </ThemedText>
+              </View>
             </View>
-
-            {/* Google button full width */}
-            <Pressable style={({ pressed }) => [styles.oauthGoogle, pressed && styles.pressed]}>
-              <Ionicons name="logo-google" size={18} color="#111" style={{ marginRight: 8 }} />
-              <ThemedText style={styles.oauthGoogleText}>Continuar con Google</ThemedText>
-            </Pressable>
           </View>
         </View>
 
-        {/* Right: aside with image and copy, only on wide web */}
         {Platform.OS === 'web' && isWide && (
           <View style={styles.rightPane}>
             <View style={styles.asideWrap}>
               <View style={styles.heroImage}>
                 <ThemedText style={styles.heroImageText}>500 x 300</ThemedText>
               </View>
-              <ThemedText style={styles.asideKicker}>Simplifique a faturação eletrónica</ThemedText>
+              <ThemedText style={styles.asideKicker}>
+                Regístrate gratis en segundos
+              </ThemedText>
               <ThemedText style={styles.asideTitle}>
-                Emite tus facturas en pocos clicks
+                Empieza a facturar con Facturahi
               </ThemedText>
             </View>
           </View>
@@ -143,8 +136,7 @@ export default function LoginScreenWeb() {
   );
 }
 
-// Tokens similar to Tailwind primitives used in your Next.js page
-const RADIUS = 8; // buttons slightly less rounded
+const RADIUS = 8;
 const BORDER = '#e5e7eb';
 const FG = '#111111';
 
@@ -156,13 +148,13 @@ const styles = StyleSheet.create({
 
   leftPane: {
     flexBasis: 0,
-    flexGrow: 7, // ~35%
+    flexGrow: 7,
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
   formWrap: {
     width: '100%',
-    maxWidth: 384, // ~ w-96
+    maxWidth: 384,
     marginLeft: 'auto',
     marginRight: 'auto',
     gap: 8,
@@ -170,10 +162,10 @@ const styles = StyleSheet.create({
 
   rightPane: {
     flexBasis: 0,
-    flexGrow: 13, // ~65%
+    flexGrow: 13,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.03)', // bg-primary/5
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   asideWrap: {
     alignItems: 'center',
@@ -195,14 +187,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   heroImageText: { color: '#9ca3af' },
-
-  h1: { fontSize: 30, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700', color: FG },
-  muted: { marginTop: 6, color: '#6b7280', fontSize: 14 },
-  link: { color: '#111', opacity: 0.9 },
-  linkStrong: { fontWeight: '600' },
-  small: { fontSize: 14 },
-  label: { fontWeight: '600', color: FG, fontSize: 14 },
-
   asideKicker: { fontSize: 14, opacity: 0.8, marginBottom: 6, textAlign: 'center' },
   asideTitle: {
     fontSize: 34,
@@ -212,6 +196,11 @@ const styles = StyleSheet.create({
     color: FG,
   },
 
+  h1: { fontSize: 30, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700', color: FG },
+  muted: { marginTop: 6, color: '#6b7280', fontSize: 14 },
+  link: { color: '#111', opacity: 0.9 },
+  linkStrong: { fontWeight: '600' },
+  label: { fontWeight: '600', color: FG, fontSize: 14 },
   input: {
     borderWidth: 1,
     borderColor: BORDER,
@@ -220,7 +209,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: '#fff',
   },
-  rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   primary: {
     backgroundColor: '#111',
     borderRadius: RADIUS,
@@ -230,9 +218,5 @@ const styles = StyleSheet.create({
   },
   primaryText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   pressed: { opacity: 0.85 },
-  altDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 24, marginBottom: 10 },
-  altText: { opacity: 0.6, fontSize: 14 },
-  altLine: { flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.08)' },
-  oauthGoogle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: BORDER, borderRadius: RADIUS, paddingVertical: 8 },
-  oauthGoogleText: { color: '#111', fontWeight: '600', fontSize: 14 },
 });
+
