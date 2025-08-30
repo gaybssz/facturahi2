@@ -1,7 +1,10 @@
+import { ThemedText } from '@/components/ThemedText';
+import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,9 +13,6 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import VerifactuAnimation from '@/components/VerifactuAnimation.web';
-import { ThemedText } from '@/components/ThemedText';
 
 // Breakpoint similar to Tailwind's lg
 const useIsWide = () => {
@@ -25,13 +25,15 @@ export default function LoginScreenWeb() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const isWide = useIsWide();
 
   const onSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert('Falta información', 'Ingresa email y contraseña.');
-      return;
-    }
+    const next: { email?: string; password?: string } = {};
+    if (!email) next.email = 'Ingresa tu email.';
+    if (!password) next.password = 'Ingresa tu contraseña.';
+    setErrors(next);
+    if (next.email || next.password) return;
     try {
       setSubmitting(true);
       await new Promise((r) => setTimeout(r, 600));
@@ -54,7 +56,7 @@ export default function LoginScreenWeb() {
         <View style={styles.leftPane}>
           <View style={styles.formWrap}>
             <View>
-              <ThemedText style={styles.h1}>Inicia sesión</ThemedText>
+              <ThemedText style={styles.h1}>Bienvenido</ThemedText>
               <ThemedText style={styles.muted}>
                 ¿No tienes cuenta?{' '}
                 <Link href="/(auth)/signup">
@@ -66,8 +68,8 @@ export default function LoginScreenWeb() {
             </View>
 
             <View style={{ marginTop: 24 }}>
-              <View style={{ gap: 6, marginBottom: 14 }}>
-                <ThemedText style={styles.label}>Email</ThemedText>
+              <View style={{ gap: 4, marginBottom: 14 }}>
+                <ThemedText style={[styles.label, errors.email && styles.labelError]}>Email</ThemedText>
                 <TextInput
                   placeholder="m@example.com"
                   autoCapitalize="none"
@@ -76,18 +78,21 @@ export default function LoginScreenWeb() {
                   placeholderTextColor="#9ca3af"
                   value={email}
                   onChangeText={setEmail}
-                  style={styles.input}
+                  style={[styles.input, errors.email && styles.inputError]}
                 />
+                {errors.email ? (
+                  <ThemedText style={styles.errorText}>{errors.email}</ThemedText>
+                ) : null}
               </View>
 
-              <View style={{ gap: 6, marginBottom: 14 }}>
+              <View style={{ gap: 4, marginBottom: 14 }}>
                 <View style={styles.rowBetween}>
-                  <ThemedText style={styles.label}>Contraseña</ThemedText>
-              <Link href="/(auth)/forgot">
-                <ThemedText type="link" style={[styles.link, styles.small]}>
-                  ¿Has olvidado tu contraseña?
-                </ThemedText>
-              </Link>
+                  <ThemedText style={[styles.label, errors.password && styles.labelError]}>Contraseña</ThemedText>
+                  <Link href="/(auth)/forgot">
+                    <ThemedText type="link" style={[styles.link, styles.small]}>
+                      ¿Has olvidado tu contraseña?
+                    </ThemedText>
+                  </Link>
                 </View>
                 <TextInput
                   placeholder="Contraseña"
@@ -95,8 +100,11 @@ export default function LoginScreenWeb() {
                   placeholderTextColor="#9ca3af"
                   value={password}
                   onChangeText={setPassword}
-                  style={styles.input}
+                  style={[styles.input, errors.password && styles.inputError]}
                 />
+                {errors.password ? (
+                  <ThemedText style={styles.errorText}>{errors.password}</ThemedText>
+                ) : null}
               </View>
 
               <Pressable
@@ -117,11 +125,17 @@ export default function LoginScreenWeb() {
               <View style={styles.altLine} />
             </View>
 
-            {/* Google button full width */}
-            <Pressable style={({ pressed }) => [styles.oauthGoogle, pressed && styles.pressed]}>
-              <Ionicons name="logo-google" size={18} color="#111" style={{ marginRight: 8 }} />
-              <ThemedText style={styles.oauthGoogleText}>Continuar con Google</ThemedText>
-            </Pressable>
+            {/* Social buttons split 50/50 */}
+            <View style={styles.socialRow}>
+              <Pressable style={({ pressed }) => [styles.oauthApple, pressed && styles.pressed]}>
+                <Ionicons name="logo-apple" size={18} color="#111" style={{ marginRight: 8 }} />
+                <ThemedText style={styles.oauthAppleText}>Continuar con Apple</ThemedText>
+              </Pressable>
+              <Pressable style={({ pressed }) => [styles.oauthGoogle, pressed && styles.pressed]}>
+                <Ionicons name="logo-google" size={18} color="#111" style={{ marginRight: 8 }} />
+                <ThemedText style={styles.oauthGoogleText}>Continuar con Google</ThemedText>
+              </Pressable>
+            </View>
           </View>
         </View>
 
@@ -129,11 +143,11 @@ export default function LoginScreenWeb() {
         {Platform.OS === 'web' && isWide && (
           <View style={styles.rightPane}>
             <View style={styles.asideWrap}>
-              <VerifactuAnimation />
-              <ThemedText style={styles.asideKicker}>Simplifique a faturação eletrónica</ThemedText>
-              <ThemedText style={styles.asideTitle}>
-                Emite tus facturas en pocos clicks
-              </ThemedText>
+              <Image
+                source={require('../../assets/images/react-logo.png')}
+                style={styles.heroImage}
+                resizeMode="contain"
+              />
             </View>
           </View>
         )}
@@ -184,11 +198,6 @@ const styles = StyleSheet.create({
     width: 500,
     height: 300,
     borderRadius: 16,
-    marginBottom: 36,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 12 },
   },
 
   h1: { fontSize: 30, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700', color: FG },
@@ -215,6 +224,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: '#fff',
   },
+  inputError: { borderColor: '#ef4444' },
+  labelError: { color: '#ef4444' },
+  errorText: { color: '#ef4444', fontSize: 12, marginTop: 2 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   primary: {
     backgroundColor: '#111',
@@ -228,6 +240,9 @@ const styles = StyleSheet.create({
   altDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 24, marginBottom: 10 },
   altText: { opacity: 0.6, fontSize: 14 },
   altLine: { flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.08)' },
-  oauthGoogle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: BORDER, borderRadius: RADIUS, paddingVertical: 8 },
+  socialRow: { flexDirection: 'row', gap: 10 },
+  oauthApple: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: BORDER, borderRadius: RADIUS, paddingVertical: 8 },
+  oauthGoogle: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: BORDER, borderRadius: RADIUS, paddingVertical: 8 },
+  oauthAppleText: { color: '#111', fontWeight: '600', fontSize: 14 },
   oauthGoogleText: { color: '#111', fontWeight: '600', fontSize: 14 },
 });

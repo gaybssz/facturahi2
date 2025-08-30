@@ -5,23 +5,21 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput
 import { ThemedText } from '@/components/ThemedText';
 import AuthScaffold from '@/components/AuthScaffold';
 
-export default function EmailLoginNative() {
+export default function ForgotPasswordNative() {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert('Falta información', 'Ingresa email y contraseña.');
+    if (!email) {
+      Alert.alert('Falta información', 'Ingresa tu email.');
       return;
     }
     try {
       setSubmitting(true);
       await new Promise((r) => setTimeout(r, 600));
-      router.replace('/(tabs)');
-    } catch {
-      Alert.alert('No se pudo iniciar sesión', 'Inténtalo de nuevo.');
+      Alert.alert('Listo', 'Te enviamos un enlace para restablecer tu contraseña.');
+      router.back();
     } finally {
       setSubmitting(false);
     }
@@ -30,10 +28,10 @@ export default function EmailLoginNative() {
   return (
     <KeyboardAvoidingView behavior={Platform.select({ ios: 'padding', android: undefined })} style={{ flex: 1 }}>
       <AuthScaffold
-        title="Bienvenido a FacturAhí"
+        title="Recuperar contraseña"
         subtitle={
           <ThemedText style={{ opacity: 0.7 }}>
-            ¿No tienes cuenta? <Link href="/(auth)/signup"><ThemedText type="link">Regístrate</ThemedText></Link>
+            Ingresa tu email y te enviaremos un enlace.
           </ThemedText>
         }
         noCardOnMobile
@@ -52,24 +50,13 @@ export default function EmailLoginNative() {
             style={styles.input}
           />
 
-          <View style={styles.rowBetween}>
-            <ThemedText style={styles.label}>Contraseña</ThemedText>
-            <Pressable onPress={() => Alert.alert('Recuperar contraseña', 'Te enviaremos un enlace por email.')}>
-              <ThemedText type="link">¿Olvidaste tu contraseña?</ThemedText>
-            </Pressable>
-          </View>
-          <TextInput
-            placeholder="Contraseña"
-            secureTextEntry
-            placeholderTextColor="#999"
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-          />
-
           <Pressable onPress={onSubmit} style={({ pressed }) => [styles.primary, pressed && styles.pressed]} disabled={submitting}>
-            <ThemedText style={styles.primaryText}>{submitting ? 'Ingresando…' : 'Iniciar sesión'}</ThemedText>
+            <ThemedText style={styles.primaryText}>{submitting ? 'Enviando…' : 'Enviar enlace'}</ThemedText>
           </Pressable>
+
+          <View style={{ alignItems: 'center' }}>
+            <Link href="/(auth)/login"><ThemedText type="link">Volver al inicio de sesión</ThemedText></Link>
+          </View>
         </View>
       </AuthScaffold>
     </KeyboardAvoidingView>
@@ -78,7 +65,6 @@ export default function EmailLoginNative() {
 
 const styles = StyleSheet.create({
   formRow: { gap: 12 },
-  rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   label: { fontWeight: '600' },
   input: {
     borderWidth: 1,

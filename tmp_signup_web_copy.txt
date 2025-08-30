@@ -1,16 +1,17 @@
-import { ThemedText } from '@/components/ThemedText';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Image,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
   TextInput,
   View,
+  Image,
   useWindowDimensions,
 } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
 
 // Breakpoint similar to Tailwind's lg
 const useIsWide = () => {
@@ -23,21 +24,25 @@ export default function SignupScreenWeb() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
   const isWide = useIsWide();
 
   const onSubmit = async () => {
-    const next: { name?: string; email?: string; password?: string } = {};
-    if (!name) next.name = 'Ingresa tu nombre.';
-    if (!email) next.email = 'Ingresa tu email.';
-    if (!password) next.password = 'Ingresa tu contraseña.';
-    setErrors(next);
-    if (next.name || next.email || next.password) return;
+    if (!name || !email || !password || !confirm) {
+      Alert.alert('Faltan datos', 'Completa todos los campos.');
+      return;
+    }
+    if (password !== confirm) {
+      Alert.alert('Las contraseñas no coinciden');
+      return;
+    }
     try {
       setSubmitting(true);
       await new Promise((r) => setTimeout(r, 600));
       router.replace('/(tabs)');
+    } catch {
+      Alert.alert('No se pudo registrar', 'Inténtalo de nuevo.');
     } finally {
       setSubmitting(false);
     }
@@ -64,21 +69,20 @@ export default function SignupScreenWeb() {
             </View>
 
             <View style={{ marginTop: 24 }}>
-              <View style={{ gap: 4, marginBottom: 14 }}>
-                <ThemedText style={[styles.label, errors.name && styles.labelError]}>Nombre completo</ThemedText>
+              <View style={{ gap: 6, marginBottom: 14 }}>
+                <ThemedText style={styles.label}>Nombre completo</ThemedText>
                 <TextInput
                   placeholder="John Doe"
                   autoCapitalize="words"
                   placeholderTextColor="#9ca3af"
                   value={name}
                   onChangeText={setName}
-                  style={[styles.input, errors.name && styles.inputError]}
+                  style={styles.input}
                 />
-                {errors.name ? (<ThemedText style={styles.errorText}>{errors.name}</ThemedText>) : null}
               </View>
 
-              <View style={{ gap: 4, marginBottom: 14 }}>
-                <ThemedText style={[styles.label, errors.email && styles.labelError]}>Email</ThemedText>
+              <View style={{ gap: 6, marginBottom: 14 }}>
+                <ThemedText style={styles.label}>Email</ThemedText>
                 <TextInput
                   placeholder="m@example.com"
                   autoCapitalize="none"
@@ -87,22 +91,32 @@ export default function SignupScreenWeb() {
                   placeholderTextColor="#9ca3af"
                   value={email}
                   onChangeText={setEmail}
-                  style={[styles.input, errors.email && styles.inputError]}
+                  style={styles.input}
                 />
-                {errors.email ? (<ThemedText style={styles.errorText}>{errors.email}</ThemedText>) : null}
               </View>
 
-              <View style={{ gap: 4, marginBottom: 14 }}>
-                <ThemedText style={[styles.label, errors.password && styles.labelError]}>Contraseña</ThemedText>
+              <View style={{ gap: 6, marginBottom: 14 }}>
+                <ThemedText style={styles.label}>Contraseña</ThemedText>
                 <TextInput
                   placeholder="Contraseña"
                   secureTextEntry
                   placeholderTextColor="#9ca3af"
                   value={password}
                   onChangeText={setPassword}
-                  style={[styles.input, errors.password && styles.inputError]}
+                  style={styles.input}
                 />
-                {errors.password ? (<ThemedText style={styles.errorText}>{errors.password}</ThemedText>) : null}
+              </View>
+
+              <View style={{ gap: 6, marginBottom: 14 }}>
+                <ThemedText style={styles.label}>Confirmar contraseña</ThemedText>
+                <TextInput
+                  placeholder="Confirmar contraseña"
+                  secureTextEntry
+                  placeholderTextColor="#9ca3af"
+                  value={confirm}
+                  onChangeText={setConfirm}
+                  style={styles.input}
+                />
               </View>
 
               <Pressable
@@ -172,12 +186,19 @@ const styles = StyleSheet.create({
     maxWidth: 560,
   },
   heroImage: { width: 500, height: 300, borderRadius: 16 },
+  asideKicker: { fontSize: 14, opacity: 0.8, marginBottom: 6, textAlign: 'center' },
+  asideTitle: {
+    fontSize: 34,
+    lineHeight: 40,
+    fontWeight: '700',
+    textAlign: 'center',
+    color: FG,
+  },
 
   h1: { fontSize: 30, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700', color: FG },
   muted: { marginTop: 6, color: '#6b7280', fontSize: 14 },
   link: { color: '#111', opacity: 0.9 },
   linkStrong: { fontWeight: '600' },
-  small: { fontSize: 14 },
   label: { fontWeight: '600', color: FG, fontSize: 14 },
   input: {
     borderWidth: 1,
@@ -187,9 +208,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: '#fff',
   },
-  inputError: { borderColor: '#ef4444' },
-  labelError: { color: '#ef4444' },
-  errorText: { color: '#ef4444', fontSize: 12, marginTop: 2 },
   primary: {
     backgroundColor: '#111',
     borderRadius: RADIUS,
@@ -200,3 +218,5 @@ const styles = StyleSheet.create({
   primaryText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   pressed: { opacity: 0.85 },
 });
+
+

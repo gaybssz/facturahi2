@@ -5,7 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 
 type Props = PropsWithChildren<{
-  title: string;
+  title: ReactNode | string;
   subtitle?: ReactNode;
   aside?: ReactNode; // Right-side content on wide screens
   /** On mobile, render children without a card container */
@@ -25,8 +25,18 @@ export default function AuthScaffold({ title, subtitle, aside, noCardOnMobile = 
     return (
       <ThemedView style={styles.rootRow}>
         <ScrollView contentContainerStyle={styles.leftCol} showsVerticalScrollIndicator={false}>
-          <ThemedText type="title" style={styles.title}>{title}</ThemedText>
-          {subtitle ? <ThemedText style={styles.subtitle}>{subtitle}</ThemedText> : null}
+          {typeof title === 'string' ? (
+            <ThemedText type="title" style={styles.title}>{title}</ThemedText>
+          ) : (
+            <View style={styles.titleWrap}>{title}</View>
+          )}
+          {subtitle ? (
+            typeof subtitle === 'string' ? (
+              <ThemedText style={styles.subtitle}>{subtitle}</ThemedText>
+            ) : (
+              <View style={styles.subtitleWrap}>{subtitle}</View>
+            )
+          ) : null}
           {noCardOnWeb ? (
             <View style={styles.content}>{children}</View>
           ) : (
@@ -56,8 +66,18 @@ export default function AuthScaffold({ title, subtitle, aside, noCardOnMobile = 
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText type="title" style={styles.title}>{title}</ThemedText>
-        {subtitle ? <ThemedText style={styles.subtitle}>{subtitle}</ThemedText> : null}
+        {typeof title === 'string' ? (
+          <ThemedText type="title" style={styles.title}>{title}</ThemedText>
+        ) : (
+          <View style={styles.titleWrap}>{title}</View>
+        )}
+        {subtitle ? (
+          typeof subtitle === 'string' ? (
+            <ThemedText style={styles.subtitle}>{subtitle}</ThemedText>
+          ) : (
+            <View style={styles.subtitleWrap}>{subtitle}</View>
+          )
+        ) : null}
         {noCardOnMobile ? (
           <View style={styles.content}>{children}</View>
         ) : (
@@ -75,7 +95,9 @@ const styles = StyleSheet.create({
   rightCol: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: 'rgba(0,0,0,0.03)' },
   vDivider: { width: 1, backgroundColor: 'rgba(0,0,0,0.06)' },
   title: { marginTop: 8, marginBottom: 6 },
+  titleWrap: { marginTop: 8, marginBottom: 6 },
   subtitle: { opacity: 0.7, marginBottom: 12 },
+  subtitleWrap: { marginBottom: 12 },
   card: {
     gap: 12,
     padding: 16,

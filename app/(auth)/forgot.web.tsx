@@ -12,32 +12,28 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-// Breakpoint similar to Tailwind's lg
 const useIsWide = () => {
   const { width } = useWindowDimensions();
   return width >= 1024;
 };
 
-export default function SignupScreenWeb() {
+export default function ForgotScreenWeb() {
   const router = useRouter();
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
+  const [error, setError] = useState<string | undefined>();
   const isWide = useIsWide();
 
   const onSubmit = async () => {
-    const next: { name?: string; email?: string; password?: string } = {};
-    if (!name) next.name = 'Ingresa tu nombre.';
-    if (!email) next.email = 'Ingresa tu email.';
-    if (!password) next.password = 'Ingresa tu contraseña.';
-    setErrors(next);
-    if (next.name || next.email || next.password) return;
+    if (!email) {
+      setError('Ingresa tu email.');
+      return;
+    }
+    setError(undefined);
     try {
       setSubmitting(true);
       await new Promise((r) => setTimeout(r, 600));
-      router.replace('/(tabs)');
+      router.replace('/(auth)/login');
     } finally {
       setSubmitting(false);
     }
@@ -50,35 +46,17 @@ export default function SignupScreenWeb() {
     >
       <View style={[styles.grid, isWide ? styles.gridWide : styles.gridNarrow]}>
         <View style={styles.leftPane}>
-          <View style={styles.formWrap}>
+          <View style={[styles.formWrap, styles.formWrapLeft]}>
             <View>
-              <ThemedText style={styles.h1}>Crea tu cuenta</ThemedText>
-              <ThemedText style={styles.muted}>
-                ¿Ya tienes cuenta?{' '}
-                <Link href="/(auth)/login">
-                  <ThemedText style={[styles.linkStrong, styles.link]}>
-                    Inicia sesión
-                  </ThemedText>
-                </Link>
+              <ThemedText style={styles.h1}>¿Has olvidado tu contraseña?</ThemedText>
+              <ThemedText style={styles.desc}>
+                No te preocupes. Introduce tu email y te enviaremos un enlace para restablecerla.
               </ThemedText>
             </View>
 
             <View style={{ marginTop: 24 }}>
               <View style={{ gap: 4, marginBottom: 14 }}>
-                <ThemedText style={[styles.label, errors.name && styles.labelError]}>Nombre completo</ThemedText>
-                <TextInput
-                  placeholder="John Doe"
-                  autoCapitalize="words"
-                  placeholderTextColor="#9ca3af"
-                  value={name}
-                  onChangeText={setName}
-                  style={[styles.input, errors.name && styles.inputError]}
-                />
-                {errors.name ? (<ThemedText style={styles.errorText}>{errors.name}</ThemedText>) : null}
-              </View>
-
-              <View style={{ gap: 4, marginBottom: 14 }}>
-                <ThemedText style={[styles.label, errors.email && styles.labelError]}>Email</ThemedText>
+                <ThemedText style={[styles.label, error && styles.labelError]}>Email</ThemedText>
                 <TextInput
                   placeholder="m@example.com"
                   autoCapitalize="none"
@@ -87,22 +65,9 @@ export default function SignupScreenWeb() {
                   placeholderTextColor="#9ca3af"
                   value={email}
                   onChangeText={setEmail}
-                  style={[styles.input, errors.email && styles.inputError]}
+                  style={[styles.input, error && styles.inputError]}
                 />
-                {errors.email ? (<ThemedText style={styles.errorText}>{errors.email}</ThemedText>) : null}
-              </View>
-
-              <View style={{ gap: 4, marginBottom: 14 }}>
-                <ThemedText style={[styles.label, errors.password && styles.labelError]}>Contraseña</ThemedText>
-                <TextInput
-                  placeholder="Contraseña"
-                  secureTextEntry
-                  placeholderTextColor="#9ca3af"
-                  value={password}
-                  onChangeText={setPassword}
-                  style={[styles.input, errors.password && styles.inputError]}
-                />
-                {errors.password ? (<ThemedText style={styles.errorText}>{errors.password}</ThemedText>) : null}
+                {error ? <ThemedText style={styles.errorText}>{error}</ThemedText> : null}
               </View>
 
               <Pressable
@@ -111,9 +76,16 @@ export default function SignupScreenWeb() {
                 disabled={submitting}
               >
                 <ThemedText style={styles.primaryText}>
-                  {submitting ? 'Creando…' : 'Crear cuenta'}
+                  {submitting ? 'Enviando…' : 'Enviar enlace de reinicio'}
                 </ThemedText>
               </Pressable>
+
+              <View style={styles.footerRow}>
+                <ThemedText style={styles.footerMuted}>¿Recuerdas tu contraseña? </ThemedText>
+                <Link href="/(auth)/login">
+                  <ThemedText style={[styles.linkStrong, styles.link]}>Iniciar sesión</ThemedText>
+                </Link>
+              </View>
             </View>
           </View>
         </View>
@@ -143,42 +115,20 @@ const styles = StyleSheet.create({
   grid: { flex: 1 },
   gridWide: { flexDirection: 'row' },
   gridNarrow: { flexDirection: 'column' },
-
-  leftPane: {
-    flexBasis: 0,
-    flexGrow: 7,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
+  leftPane: { flexBasis: 0, flexGrow: 7, justifyContent: 'center', paddingHorizontal: 24 },
+  rightPane: { flexBasis: 0, flexGrow: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.03)' },
   formWrap: {
     width: '100%',
-    maxWidth: 384,
-    marginLeft: 'auto',
-    marginRight: 'auto',
     gap: 8,
   },
-
-  rightPane: {
-    flexBasis: 0,
-    flexGrow: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.03)',
-  },
-  asideWrap: {
-    alignItems: 'center',
-    textAlign: 'center',
-    padding: 32,
-    maxWidth: 560,
-  },
+  formWrapLeft: { maxWidth: 384, marginLeft: 'auto', marginRight: 'auto' },
+  label: { fontWeight: '600', color: FG, fontSize: 14 },
+  asideWrap: { alignItems: 'center', textAlign: 'center', padding: 32, maxWidth: 560 },
   heroImage: { width: 500, height: 300, borderRadius: 16 },
-
   h1: { fontSize: 30, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700', color: FG },
-  muted: { marginTop: 6, color: '#6b7280', fontSize: 14 },
+  desc: { marginTop: 6, color: '#6b7280', fontSize: 14 },
   link: { color: '#111', opacity: 0.9 },
   linkStrong: { fontWeight: '600' },
-  small: { fontSize: 14 },
-  label: { fontWeight: '600', color: FG, fontSize: 14 },
   input: {
     borderWidth: 1,
     borderColor: BORDER,
@@ -199,4 +149,6 @@ const styles = StyleSheet.create({
   },
   primaryText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   pressed: { opacity: 0.85 },
+  footerRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 20 },
+  footerMuted: { color: '#6b7280', fontSize: 14, marginRight: 4 },
 });
