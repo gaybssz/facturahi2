@@ -4,7 +4,6 @@ import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,6 +12,9 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import RightPanel from './RightPanel.web'; // <-- novo componente separado
+
+const BLUE = '#2563EB';
 
 // Breakpoint similar to Tailwind's lg
 const useIsWide = () => {
@@ -26,6 +28,8 @@ export default function LoginScreenWeb() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [focusEmail, setFocusEmail] = useState(false);
+  const [focusPassword, setFocusPassword] = useState(false);
   const isWide = useIsWide();
 
   const onSubmit = async () => {
@@ -70,16 +74,20 @@ export default function LoginScreenWeb() {
             <View style={{ marginTop: 24 }}>
               <View style={{ gap: 4, marginBottom: 14 }}>
                 <ThemedText style={[styles.label, errors.email && styles.labelError]}>Email</ThemedText>
-                <TextInput
-                  placeholder="m@example.com"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  placeholderTextColor="#9ca3af"
-                  value={email}
-                  onChangeText={setEmail}
-                  style={[styles.input, errors.email && styles.inputError]}
-                />
+                <View style={[styles.inputContainer, focusEmail && styles.inputFocused, errors.email && styles.inputError]}>
+                  <TextInput
+                    placeholder="m@example.com"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    placeholderTextColor="#9ca3af"
+                    value={email}
+                    onChangeText={setEmail}
+                    onFocus={() => setFocusEmail(true)}
+                    onBlur={() => setFocusEmail(false)}
+                    style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' }]}
+                  />
+                </View>
                 {errors.email ? (
                   <ThemedText style={styles.errorText}>{errors.email}</ThemedText>
                 ) : null}
@@ -94,14 +102,18 @@ export default function LoginScreenWeb() {
                     </ThemedText>
                   </Link>
                 </View>
-                <TextInput
-                  placeholder="Contraseña"
-                  secureTextEntry
-                  placeholderTextColor="#9ca3af"
-                  value={password}
-                  onChangeText={setPassword}
-                  style={[styles.input, errors.password && styles.inputError]}
-                />
+                <View style={[styles.inputContainer, focusPassword && styles.inputFocused, errors.password && styles.inputError]}>
+                  <TextInput
+                    placeholder="Contraseña"
+                    secureTextEntry
+                    placeholderTextColor="#9ca3af"
+                    value={password}
+                    onChangeText={setPassword}
+                    onFocus={() => setFocusPassword(true)}
+                    onBlur={() => setFocusPassword(false)}
+                    style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' }]}
+                  />
+                </View>
                 {errors.password ? (
                   <ThemedText style={styles.errorText}>{errors.password}</ThemedText>
                 ) : null}
@@ -140,16 +152,8 @@ export default function LoginScreenWeb() {
         </View>
 
         {/* Right: aside with image and copy, only on wide web */}
-        {Platform.OS === 'web' && isWide && (
-          <View style={styles.rightPane}>
-            <View style={styles.asideWrap}>
-              <Image
-                source={require('../../assets/images/react-logo.png')}
-                style={styles.heroImage}
-                resizeMode="contain"
-              />
-            </View>
-          </View>
+        {Platform.OS === "web" && isWide && (
+          <RightPanel />
         )}
       </View>
     </KeyboardAvoidingView>
@@ -186,7 +190,11 @@ const styles = StyleSheet.create({
     flexGrow: 13, // ~65%
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.03)', // bg-primary/5
+    backgroundColor: BLUE, // Changed to BLUE
+    alignSelf: 'stretch', // <-- ensure it stretches vertically
+    height: '100%',        // <-- guarantee full height
+    position: 'relative', // <-- required so pager absolute is positioned inside this pane
+    overflow: 'hidden',   // <-- prevent slides/text from escaping the blue panel
   },
   asideWrap: {
     alignItems: 'center',
@@ -202,7 +210,7 @@ const styles = StyleSheet.create({
 
   h1: { fontSize: 30, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700', color: FG },
   muted: { marginTop: 6, color: '#6b7280', fontSize: 14 },
-  link: { color: '#111', opacity: 0.9 },
+  link: { color: BLUE, opacity: 0.9 },
   linkStrong: { fontWeight: '600' },
   small: { fontSize: 14 },
   label: { fontWeight: '600', color: FG, fontSize: 14 },
@@ -216,20 +224,23 @@ const styles = StyleSheet.create({
     color: FG,
   },
 
-  input: {
+  inputContainer: {
     borderWidth: 1,
     borderColor: BORDER,
     borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
     backgroundColor: '#fff',
   },
+  input: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  inputFocused: { borderColor: BLUE },
   inputError: { borderColor: '#ef4444' },
   labelError: { color: '#ef4444' },
   errorText: { color: '#ef4444', fontSize: 12, marginTop: 2 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   primary: {
-    backgroundColor: '#111',
+    backgroundColor: BLUE,
     borderRadius: RADIUS,
     paddingVertical: 8,
     alignItems: 'center',

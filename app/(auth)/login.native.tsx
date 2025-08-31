@@ -43,14 +43,14 @@ export default function LoginScreenNative() {
           </View>
 
           {/* Title */}
-          <View style={{ alignItems: 'center', marginTop: 4 }}>
+          <View style={{ alignItems: 'center', marginTop: 24 }}>
             <ThemedText style={styles.h1Small}>Bienvenido de nuevo</ThemedText>
-            <ThemedText style={{ opacity: 0.7, marginTop: 6, textAlign: 'center' }}>
+            <ThemedText style={styles.subtitle}>
               Accede a tu cuenta para empezar a emitir tus facturas
             </ThemedText>
           </View>
 
-          <View>
+          <View style={{ marginTop: 20 }}>
             <ThemedText style={styles.label}>Email</ThemedText>
             <View style={[styles.inputRow, focusEmail && styles.inputRowFocused]}>
               <TextInput
@@ -85,8 +85,8 @@ export default function LoginScreenNative() {
                 <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="#6b7280" />
               </Pressable>
             </View>
-            <Pressable onPress={() => router.push('/(auth)/forgot')} style={{ marginTop: 8 }}>
-              <ThemedText style={{ color: BLUE, fontWeight: '700' }}>Olvidé mi contraseña</ThemedText>
+            <Pressable onPress={() => router.push('/(auth)/forgot')} style={{ marginTop: 8, alignItems: 'flex-start' }}>
+              <ThemedText style={{ color: BLUE, fontWeight: '700', fontSize: 14 }}>Olvidé mi contraseña</ThemedText>
             </Pressable>
           </View>
 
@@ -98,9 +98,11 @@ export default function LoginScreenNative() {
             <ThemedText style={styles.primaryText}>{submitting ? 'Entrando…' : 'Continuar'}</ThemedText>
           </Pressable>
 
+          <View style={{ flex: 1 }} />
+
           <View style={styles.altDivider}>
             <View style={styles.altLine} />
-            <ThemedText style={{ opacity: 0.6 }}>o</ThemedText>
+            <ThemedText style={{ opacity: 0.6 }}>o entra con</ThemedText>
             <View style={styles.altLine} />
           </View>
 
@@ -115,7 +117,7 @@ export default function LoginScreenNative() {
 
           <View style={styles.signupInline}>
             <ThemedText style={{ opacity: 0.7 }}>¿No tienes cuenta? </ThemedText>
-            <Link href="/(auth)/signup"><ThemedText style={{ color: BLUE, fontWeight: '700' }}>Crear cuenta</ThemedText></Link>
+            <Link href="/(auth)/signup" replace><ThemedText style={{ color: BLUE, fontWeight: '700' }}>Crear cuenta</ThemedText></Link>
           </View>
         </View>
       </AuthScaffold>
@@ -124,11 +126,12 @@ export default function LoginScreenNative() {
 }
 
 const styles = StyleSheet.create({
-  form: { gap: 14 },
+  form: { flex: 1, gap: 16 },
   topBar: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   backBtn: { paddingVertical: 6, paddingRight: 8, paddingLeft: 0 },
   logoSpace: { width: 28, height: 28, borderRadius: 14, marginLeft: 6, backgroundColor: 'transparent' },
   h1Small: { fontSize: 24, lineHeight: 28, fontWeight: '700' },
+  subtitle: { opacity: 0.7, marginTop: 8, textAlign: 'center', paddingHorizontal: 12 },
   label: { fontWeight: '700', marginBottom: 8 },
   inputRow: {
     flexDirection: 'row',
@@ -139,15 +142,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   inputRowFocused: { borderColor: BLUE },
-  input: { flex: 1, paddingHorizontal: 14, paddingVertical: 14 },
+  input: { flex: 1, paddingHorizontal: 14, paddingVertical: 14, fontSize: 16 },
   eyeBtn: { position: 'absolute', right: 12, height: '100%', justifyContent: 'center', alignItems: 'center' },
-  primary: { marginTop: 6, backgroundColor: BLUE, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  primary: { marginTop: 8, backgroundColor: BLUE, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   primaryDisabled: { backgroundColor: '#d1d5db' },
   buttonPressed: { opacity: 0.9 },
-  primaryText: { color: '#fff', fontWeight: '700' },
-  altDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6, marginBottom: 2 },
+  primaryText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  altDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, marginBottom: 8 },
   altLine: { flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.12)' },
-  socialRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 6 },
+  socialRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 8 },
   socialCircle: {
     width: 48,
     height: 48,
@@ -160,4 +163,3 @@ const styles = StyleSheet.create({
   },
   signupInline: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8 },
 });
-

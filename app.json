@@ -37,6 +37,10 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "SUPABASE_URL": "https://digsgaqnkdyuvbynghga.supabase.co",
+      "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZ3NnYXFua2R5dXZieW5naGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2NTc0NzcsImV4cCI6MjA3MjIzMzQ3N30.cjXm3BCTuFrRYv0nyzqYskOkj02wOePvm4ostVba0Uw"
     }
   }
 }

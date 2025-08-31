@@ -1,5 +1,5 @@
 import { Link, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, SafeAreaView, StyleSheet, View, useWindowDimensions, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
@@ -13,6 +13,7 @@ export default function MobileOnboarding() {
   const { width } = useWindowDimensions();
   const dynamicRadius = Math.round(width * 0.24); // slightly more rounded (~24% width)
   const [page, setPage] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
   const slides = [
     {
       title: 'Todas tus facturas en un solo lugar',
@@ -28,13 +29,21 @@ export default function MobileOnboarding() {
     },
   ];
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextPage = (page + 1) % slides.length;
+      scrollViewRef.current?.scrollTo({ x: nextPage * width, animated: true });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [page, width, slides.length]);
+
   return (
     <KeyboardAvoidingView behavior={Platform.select({ ios: 'padding', android: undefined })} style={{ flex: 1 }}>
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={styles.root}>
           <StatusBar style="light" backgroundColor="#2563EB" />
           {/* Paint the top safe-area to blue (slightly transparent) */}
-          <View style={{ height: insets.top, backgroundColor: 'rgba(37,99,235,0.92)', position: 'absolute', top: 0, left: 0, right: 0 }} />
+          <View style={{ height: insets.top, backgroundColor: 'rgba(37,99,235,0.8)', position: 'absolute', top: 0, left: 0, right: 0 }} />
           {/* Hero area (blue background) */}
           <View style={[
             styles.hero,
@@ -44,8 +53,9 @@ export default function MobileOnboarding() {
           </View>
 
           {/* Headline slider */}
-          <View style={{ marginTop: 72 }}>
+          <View style={{ marginTop: 96 }}>
             <ScrollView
+              ref={scrollViewRef}
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
@@ -89,7 +99,7 @@ const BLUE = '#2563EB';
 const styles = StyleSheet.create({
   root: { flex: 1, position: 'relative' },
   hero: {
-    backgroundColor: 'rgba(37,99,235,0.92)',
+    backgroundColor: 'rgba(37,99,235,0.8)',
     alignItems: 'center',
     justifyContent: 'center',
     height: '45%',

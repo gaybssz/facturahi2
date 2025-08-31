@@ -59,7 +59,7 @@ export default function AuthScaffold({ title, subtitle, aside, noCardOnMobile = 
         contentContainerStyle={[
           styles.colWrap,
           {
-            paddingTop: Math.max(24, insets.top + 24),
+            paddingTop: insets.top,
             paddingBottom: Math.max(24, insets.bottom + 24),
             justifyContent: mobileAlign === 'end' ? 'flex-end' : mobileAlign === 'center' ? 'center' : 'flex-start',
           },

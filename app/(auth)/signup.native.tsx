@@ -48,14 +48,14 @@ export default function SignupScreen() {
           </View>
 
           {/* Title */}
-          <View style={{ alignItems: 'center', marginTop: 4 }}>
+          <View style={{ alignItems: 'center', marginTop: 24 }}>
             <ThemedText style={styles.h1Small}>Crea tu cuenta</ThemedText>
-            <ThemedText style={{ opacity: 0.7, marginTop: 6, textAlign: 'center' }}>
+            <ThemedText style={styles.subtitle}>
               Crea una cuenta para empezar a emitir tus facturas
             </ThemedText>
           </View>
 
-          <View>
+          <View style={{ marginTop: 20 }}>
             <ThemedText style={styles.label}>Email</ThemedText>
             <View style={[styles.inputRow, focusEmail && styles.inputRowFocused]}>
               <TextInput
@@ -102,13 +102,15 @@ export default function SignupScreen() {
 
           <ThemedText style={styles.terms}>
             Al crear tu cuenta aceptas nuestros{' '}
-            <ThemedText style={{ color: BLUE, fontWeight: '600' }}>Términos de uso</ThemedText>{' '}y{' '}
-            <ThemedText style={{ color: BLUE, fontWeight: '600' }}>Políticas de privacidad</ThemedText>
+            <ThemedText style={{ color: BLUE, fontWeight: '600', fontSize: 12 }}>Términos de uso</ThemedText>{' '}y{' '}
+            <ThemedText style={{ color: BLUE, fontWeight: '600', fontSize: 12 }}>Políticas de privacidad</ThemedText>
           </ThemedText>
+
+          <View style={{ flex: 1 }} />
 
           <View style={styles.altDivider}>
             <View style={styles.altLine} />
-            <ThemedText style={{ opacity: 0.6 }}>o</ThemedText>
+            <ThemedText style={{ opacity: 0.6 }}>o crea tu cuenta con</ThemedText>
             <View style={styles.altLine} />
           </View>
 
@@ -124,7 +126,7 @@ export default function SignupScreen() {
 
           <View style={styles.loginInline}>
             <ThemedText style={{ opacity: 0.7 }}>¿Ya tienes una cuenta? </ThemedText>
-            <Link href="/(auth)/login"><ThemedText style={{ color: BLUE, fontWeight: '700' }}>Iniciar sesión</ThemedText></Link>
+            <Link href="/(auth)/login" replace><ThemedText style={{ color: BLUE, fontWeight: '700' }}>Iniciar sesión</ThemedText></Link>
           </View>
         </View>
       </AuthScaffold>
@@ -133,11 +135,12 @@ export default function SignupScreen() {
 }
 
 const styles = StyleSheet.create({
-  form: { gap: 14 },
+  form: { flex: 1, gap: 16 },
   topBar: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   backBtn: { paddingVertical: 6, paddingRight: 8, paddingLeft: 0 },
   logoSpace: { width: 28, height: 28, borderRadius: 14, marginLeft: 6, backgroundColor: 'transparent' },
   h1Small: { fontSize: 24, lineHeight: 28, fontWeight: '700' },
+  subtitle: { opacity: 0.7, marginTop: 8, textAlign: 'center', paddingHorizontal: 12 },
   label: { fontWeight: '700', marginBottom: 8 },
   inputRow: {
     flexDirection: 'row',
@@ -152,16 +155,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 14,
     paddingVertical: 14,
+    fontSize: 16,
   },
   eyeBtn: { position: 'absolute', right: 12, height: '100%', justifyContent: 'center', alignItems: 'center' },
-  primary: { marginTop: 6, backgroundColor: BLUE, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  primary: { marginTop: 8, backgroundColor: BLUE, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   primaryDisabled: { backgroundColor: '#d1d5db' },
   buttonPressed: { opacity: 0.9 },
-  primaryText: { color: '#fff', fontWeight: '700' },
-  terms: { textAlign: 'center', opacity: 0.7 },
-  altDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6, marginBottom: 2 },
+  primaryText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  terms: { textAlign: 'center', opacity: 0.7, fontSize: 12 },
+  altDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, marginBottom: 8 },
   altLine: { flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.12)' },
-  socialRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 6 },
+  socialRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 8 },
   socialCircle: {
     width: 48,
     height: 48,

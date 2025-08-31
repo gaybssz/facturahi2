@@ -2,15 +2,17 @@ import { ThemedText } from '@/components/ThemedText';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-  useWindowDimensions,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
+    useWindowDimensions
 } from 'react-native';
+import RightPanel from './RightPanel.web'; // <-- reuse RightPanel component
+
+const BLUE = '#2563EB';
 
 const useIsWide = () => {
   const { width } = useWindowDimensions();
@@ -22,6 +24,7 @@ export default function ForgotScreenWeb() {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [focusEmail, setFocusEmail] = useState(false);
   const isWide = useIsWide();
 
   const onSubmit = async () => {
@@ -57,16 +60,20 @@ export default function ForgotScreenWeb() {
             <View style={{ marginTop: 24 }}>
               <View style={{ gap: 4, marginBottom: 14 }}>
                 <ThemedText style={[styles.label, error && styles.labelError]}>Email</ThemedText>
-                <TextInput
-                  placeholder="m@example.com"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  placeholderTextColor="#9ca3af"
-                  value={email}
-                  onChangeText={setEmail}
-                  style={[styles.input, error && styles.inputError]}
-                />
+                <View style={[styles.inputContainer, focusEmail && styles.inputFocused, error && styles.inputError]}>
+                  <TextInput
+                    placeholder="m@example.com"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    placeholderTextColor="#9ca3af"
+                    value={email}
+                    onChangeText={setEmail}
+                    onFocus={() => setFocusEmail(true)}
+                    onBlur={() => setFocusEmail(false)}
+                    style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' }]}
+                  />
+                </View>
                 {error ? <ThemedText style={styles.errorText}>{error}</ThemedText> : null}
               </View>
 
@@ -90,17 +97,7 @@ export default function ForgotScreenWeb() {
           </View>
         </View>
 
-        {Platform.OS === 'web' && isWide && (
-          <View style={styles.rightPane}>
-            <View style={styles.asideWrap}>
-              <Image
-                source={require('../../assets/images/react-logo.png')}
-                style={styles.heroImage}
-                resizeMode="contain"
-              />
-            </View>
-          </View>
-        )}
+        {Platform.OS === 'web' && isWide && <RightPanel />}
       </View>
     </KeyboardAvoidingView>
   );
@@ -116,7 +113,7 @@ const styles = StyleSheet.create({
   gridWide: { flexDirection: 'row' },
   gridNarrow: { flexDirection: 'column' },
   leftPane: { flexBasis: 0, flexGrow: 7, justifyContent: 'center', paddingHorizontal: 24 },
-  rightPane: { flexBasis: 0, flexGrow: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.03)' },
+  rightPane: { flexBasis: 0, flexGrow: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: BLUE },
   formWrap: {
     width: '100%',
     gap: 8,
@@ -127,21 +124,24 @@ const styles = StyleSheet.create({
   heroImage: { width: 500, height: 300, borderRadius: 16 },
   h1: { fontSize: 30, lineHeight: 36, letterSpacing: -0.3, fontWeight: '700', color: FG },
   desc: { marginTop: 6, color: '#6b7280', fontSize: 14 },
-  link: { color: '#111', opacity: 0.9 },
+  link: { color: BLUE, opacity: 0.9 },
   linkStrong: { fontWeight: '600' },
-  input: {
+  inputContainer: {
     borderWidth: 1,
     borderColor: BORDER,
     borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
     backgroundColor: '#fff',
   },
+  input: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  inputFocused: { borderColor: BLUE },
   inputError: { borderColor: '#ef4444' },
   labelError: { color: '#ef4444' },
   errorText: { color: '#ef4444', fontSize: 12, marginTop: 2 },
   primary: {
-    backgroundColor: '#111',
+    backgroundColor: BLUE,
     borderRadius: RADIUS,
     paddingVertical: 8,
     alignItems: 'center',
