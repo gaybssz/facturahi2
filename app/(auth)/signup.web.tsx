@@ -1,16 +1,17 @@
 import { ThemedText } from '@/components/ThemedText';
 import { signUpWithEmail } from '@/lib/auth';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    StyleSheet,
-    TextInput,
-    View,
-    useWindowDimensions,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  useWindowDimensions,
 } from 'react-native';
 import RightPanel from './RightPanel.web';
 
@@ -37,6 +38,12 @@ export default function SignupScreenWeb() {
     if (!password) next.password = 'Ingresa tu contraseña.';
     setErrors(next);
     if (next.email || next.password) return;
+
+    if (!isSupabaseConfigured) {
+      setErrors({ email: 'Configuração do Supabase ausente. Contate o suporte.' });
+      return;
+    }
+
     try {
       setSubmitting(true);
       await signUpWithEmail(email.trim(), password);
@@ -134,7 +141,7 @@ export default function SignupScreenWeb() {
               </Pressable>
               <Pressable style={({ pressed }) => [styles.oauthGoogle, pressed && styles.pressed]}>
                 <Ionicons name="logo-google" size={18} color="#111" style={{ marginRight: 8 }} />
-                <ThemedText style={styles.oauthGoogleText}>Continuar con Google</ThemedText>
+                <ThemedText style={styles.oauthGoogleText}>Continuar com Google</ThemedText>
               </Pressable>
             </View>
           </View>

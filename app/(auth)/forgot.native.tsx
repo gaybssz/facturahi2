@@ -1,4 +1,5 @@
 import { sendPasswordResetEmail } from '@/lib/auth';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -26,6 +27,11 @@ export default function ForgotPasswordNative() {
     }
     if (!emailRegex.test(emailTrim)) {
       Alert.alert('Erro', 'Por favor insira um email válido.');
+      return;
+    }
+
+    if (!isSupabaseConfigured) {
+      Alert.alert('Erro', 'Configuração do Supabase ausente. Contate o suporte.');
       return;
     }
 
