@@ -1,16 +1,17 @@
 import { ThemedText } from '@/components/ThemedText';
+import { signInWithEmail } from '@/lib/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-  useWindowDimensions,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
+    useWindowDimensions,
 } from 'react-native';
 import RightPanel from './RightPanel.web'; // <-- novo componente separado
 
@@ -40,10 +41,12 @@ export default function LoginScreenWeb() {
     if (next.email || next.password) return;
     try {
       setSubmitting(true);
-      await new Promise((r) => setTimeout(r, 600));
-      router.replace('/(tabs)');
-    } catch {
-      Alert.alert('No se pudo iniciar sesión', 'Inténtalo de nuevo.');
+      const user = await signInWithEmail(email.trim(), password);
+      if (user) {
+        router.replace('/(auth)/home'); // Redireciona para a página home após login bem-sucedido
+      }
+    } catch (err: any) {
+      Alert.alert('No se pudo iniciar sesión', err.message || 'Inténtalo de nuevo.');
     } finally {
       setSubmitting(false);
     }
@@ -85,7 +88,7 @@ export default function LoginScreenWeb() {
                     onChangeText={setEmail}
                     onFocus={() => setFocusEmail(true)}
                     onBlur={() => setFocusEmail(false)}
-                    style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' }]}
+                    style={[styles.input, Platform.OS === 'web' && { outlineWidth: 0 }]}
                   />
                 </View>
                 {errors.email ? (
@@ -111,7 +114,7 @@ export default function LoginScreenWeb() {
                     onChangeText={setPassword}
                     onFocus={() => setFocusPassword(true)}
                     onBlur={() => setFocusPassword(false)}
-                    style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' }]}
+                    style={[styles.input, Platform.OS === 'web' && { outlineWidth: 0 }]}
                   />
                 </View>
                 {errors.password ? (

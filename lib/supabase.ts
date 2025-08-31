@@ -2,23 +2,39 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
-// Preferências de leitura: process.env (build time) -> expoConfig.extra -> manifest.extra
-const getRuntimeExtra = () =>
-  (Constants as any)?.expoConfig?.extra ??
-  (Constants as any)?.manifest?.extra ??
-  {};
+// Preferências de leitura: process.env (build time) -> expoConfig.extra -> manifest.extra -> manifest2
+const getRuntimeExtra = () => {
+  const c = Constants as any;
+  const sources = [
+    c?.expoConfig?.extra,
+    c?.manifest?.extra,
+    c?.manifest2?.extra,
+    c?.manifest?.extra?.extra,
+  ];
+  for (const s of sources) {
+    if (s && Object.keys(s).length) return s;
+  }
+  return {};
+};
 
 const extras = getRuntimeExtra();
 
-const SUPABASE_URL = process.env.SUPABASE_URL ?? extras.SUPABASE_URL ?? '';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? extras.SUPABASE_ANON_KEY ?? '';
+const SUPABASE_URL = process.env.SUPABASE_URL ?? extras?.SUPABASE_URL ?? '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? extras?.SUPABASE_ANON_KEY ?? '';
 
-// Não lançar no momento da importação (evita erros durante SSR/compile). Apenas warn.
+// Não lançar na importação (evita erros durante SSR/compile).
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   // eslint-disable-next-line no-console
+  console.warn('Supabase config not found at runtime. Values read:');
+  // eslint-disable-next-line no-console
+  console.warn('  process.env.SUPABASE_URL:', process.env.SUPABASE_URL);
+  // eslint-disable-next-line no-console
+  console.warn('  process.env.SUPABASE_ANON_KEY present?:', Boolean(process.env.SUPABASE_ANON_KEY));
+  // eslint-disable-next-line no-console
+  console.warn('  expo extras (sample keys):', Object.keys(extras).slice(0, 20));
+  // eslint-disable-next-line no-console
   console.warn(
-    'SUPABASE_URL and SUPABASE_ANON_KEY not found at runtime. Set them in app.json (expo.extra) or as environment variables.\n' +
-      'If you are using expo-router/SSR, make sure keys are available at runtime or provide env variables during the build.'
+    'Set SUPABASE_URL and SUPABASE_ANON_KEY in app.json (expo.extra) or as environment variables and restart the dev server with cache cleared (expo start -c).'
   );
 }
 
